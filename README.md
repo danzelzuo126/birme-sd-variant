@@ -54,3 +54,11 @@ High works better on landscape/subjects typically, where as Medium is better at 
 
 ## Extra
 The Hermite quality option uses the [Hermite resize library](https://github.com/viliusle/Hermite-resize) so you can experiment with what gives you the best quality image for your source images.
+
+
+## 与 birme.net 对齐更新（2026-04）
+- 新增 AVIF 输出格式选项与独立质量参数。
+- 新增“Use High Quality Resize Method（slower）”选项，使用渐进式缩小提升降采样质量。
+- 默认 WebP 质量调整为 80，接近主站默认建议。
+
+> 说明：本仓库核心逻辑已本地化（`js/main.js`、`js/hermite.js`），仍依赖若干 CDN 三方库（jQuery/JSZip/smartcrop 等）。如需彻底离线，请继续将 `index.html` 内 CDN 脚本改为本地 vendor 文件。

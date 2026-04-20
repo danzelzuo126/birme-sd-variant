@@ -84,6 +84,10 @@
               <input id="ratio_h" class="w-25" type="number" onchange="config.update_ratio()"></input>
             </div>
           </div>
+          <div class="resize-engine mt-2">
+            <input type="checkbox" onchange="config.update(this)" id="use_hq_resize" />
+            <label for="use_hq_resize">Use High Quality Resize Method (slower)</label>
+          </div>
           <div class="crop-auto mt-2 d-none">
             <input type="checkbox" onchange="config.update(this)" id="auto_focal" />
             <label for="auto_focal">Auto detect image focal point</label>
@@ -163,6 +167,14 @@
             </div>
             <div>Quality <input type="number" min="10" id="quality_webp" onchange="config.update(this)" />%</div>
           </div>
+
+          <div class="d-flex justify-content-between align-items-center mt-2">
+            <div>
+              <input type="radio" name="image_format" id="image_format_avif" value="avif" onchange="config.update(this)" />
+              <label for="image_format_avif">AVIF</label>
+            </div>
+            <div>Quality <input type="number" min="10" id="quality_avif" onchange="config.update(this)" />%</div>
+          </div>
           <a href="https://www.birme.net/blog/best-jpeg-quality-for-bulk-image-resizing/" target="_blank">Need Help?</a>
         </div>
       </div>
@@ -198,7 +210,7 @@
     <div class="section section-about">
       <div class="content col-md-6 offset-md-3 col-xl-4 offset-xl-4">
         <h2>About</h2>
-        <p>I made this simple copy of BIRME to add more image quality options for Stable Diffusion users who crop training images!</p>
+        <p>本项目基于 BIRME 功能做本地化增强，适合 Stable Diffusion 训练集批量裁剪。</p>
         <p>NOTE: FIREFOX NOT SUPPORTED (<a href="https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/imageSmoothingQuality#browser_compatibility">supported browsers</a>)</p>
         <p><a href="https://birme.net">Support the author of BIRME</a></p>
       </div>
