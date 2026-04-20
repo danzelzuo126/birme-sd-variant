@@ -61,4 +61,13 @@ The Hermite quality option uses the [Hermite resize library](https://github.com/
 - 新增“Use High Quality Resize Method（slower）”选项，使用渐进式缩小提升降采样质量。
 - 默认 WebP 质量调整为 80，接近主站默认建议。
 
-> 说明：本仓库核心逻辑已本地化（`js/main.js`、`js/hermite.js`），仍依赖若干 CDN 三方库（jQuery/JSZip/smartcrop 等）。如需彻底离线，请继续将 `index.html` 内 CDN 脚本改为本地 vendor 文件。
+> 说明：本仓库现已移除页面中的 CDN 依赖，第三方能力已本地化到 `js/vendor/*.js`，可在离线环境运行。
+
+
+## 本地 vendor 目录
+- `js/vendor/jquery-lite.js`：项目所需最小 jQuery API 兼容层。
+- `js/vendor/load-image-lite.js`：本地图片加载封装。
+- `js/vendor/jszip-lite.js`：本地 ZIP 生成（store 模式）。
+- `js/vendor/masonry-lite.js`：轻量 Masonry 兼容层。
+- `js/vendor/smartcrop-lite.js`：居中裁剪回退实现。
+- `js/vendor/filesaver-lite.js`：本地文件保存。
