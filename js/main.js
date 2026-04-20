@@ -27,6 +27,8 @@ class BFile {
         return { ext: this.extension, format: "image/jpeg" };
       case "webp":
         return { ext: "webp", format: "image/webp" };
+      case "avif":
+        return { ext: "avif", format: "image/avif" };
     }
   }
 
@@ -68,7 +70,7 @@ class BFile {
   }
 
   get is_supported() {
-    return ["jpg", "jpeg", "png", "webp"].indexOf(this.extension.toLowerCase()) > -1;
+    return ["jpg", "jpeg", "png", "webp", "avif"].indexOf(this.extension.toLowerCase()) > -1;
   }
 
   get focal_x() {
@@ -99,7 +101,8 @@ const default_parameters = {
   auto_focal: true,
   image_format: "preserve",
   quality_jpeg: 92,
-  quality_webp: 50,
+  quality_webp: 80,
+  quality_avif: 60,
   rename: "",
   rename_start: 0,
   border_width: 0,
@@ -109,7 +112,8 @@ const default_parameters = {
   wm_size: 18,
   wm_position: "bottom-right",
   wm_margin: 20,
-  quality_preset: "high"
+  quality_preset: "high",
+  use_hq_resize: false
 };
 
 class BConfig {
@@ -585,6 +589,28 @@ class Birme {
     loadImage(f.path, img => this.process_image(img, f), { orientation: 1 });
   }
 
+  draw_with_high_quality(con, img, sx, sy, sw, sh, dx, dy, dw, dh) {
+    // Progressively downscale to reduce artifacts (similar goal to pica).
+    let sourceCanvas = document.createElement("canvas");
+    sourceCanvas.width = sw;
+    sourceCanvas.height = sh;
+    let sourceCtx = sourceCanvas.getContext("2d");
+    sourceCtx.drawImage(img, sx, sy, sw, sh, 0, 0, sw, sh);
+
+    while (sourceCanvas.width * 0.5 > dw && sourceCanvas.height * 0.5 > dh) {
+      let nextCanvas = document.createElement("canvas");
+      nextCanvas.width = Math.max(dw, Math.floor(sourceCanvas.width * 0.5));
+      nextCanvas.height = Math.max(dh, Math.floor(sourceCanvas.height * 0.5));
+      let nextCtx = nextCanvas.getContext("2d");
+      nextCtx.imageSmoothingEnabled = true;
+      nextCtx.imageSmoothingQuality = "high";
+      nextCtx.drawImage(sourceCanvas, 0, 0, sourceCanvas.width, sourceCanvas.height, 0, 0, nextCanvas.width, nextCanvas.height);
+      sourceCanvas = nextCanvas;
+    }
+
+    con.drawImage(sourceCanvas, 0, 0, sourceCanvas.width, sourceCanvas.height, dx, dy, dw, dh);
+  }
+
   process_image(img, file) {
     let tw = config.target_width;
     let th = config.target_height;
@@ -688,8 +714,11 @@ class Birme {
     /*******************************************
      * Image after the border
      ******************************************/
-    con.drawImage(img, (iw - srcw) * fx, (ih - srch) * fy, srcw, srch,
-                       hw, hw, tw - hw * 2, th - hw * 2);
+    if (config.use_hq_resize) {
+      this.draw_with_high_quality(con, img, (iw - srcw) * fx, (ih - srch) * fy, srcw, srch, hw, hw, tw - hw * 2, th - hw * 2);
+    } else {
+      con.drawImage(img, (iw - srcw) * fx, (ih - srch) * fy, srcw, srch, hw, hw, tw - hw * 2, th - hw * 2);
+    }
     if (config.wm_text) {  // ENGAGE WATERMARKING TEXT
       con.font = config.wm_size + "px " + config.map_font(config.wm_font);
       con.textBaseline = "top";
@@ -738,6 +767,8 @@ class Birme {
       quality = config.quality_jpeg / 100;
     } else if (output.format == "image/webp") {
       quality = config.quality_webp / 100;
+    } else if (output.format == "image/avif") {
+      quality = config.quality_avif / 100;
     } else if (output.format == "image/png") {
       quality = -1;
     }
